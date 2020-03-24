@@ -56,8 +56,8 @@ function LollipopBody(play, ctx, bs) {
   dBg.width = 32;
   dBg.height = 32;
 
-  let path1 = new CandyPath(),
-      path2 = new CandyPath(),
+  let path1 = new CandyPath({}),
+      path2 = new CandyPath({}),
       path = new PathCombined();
 
   this.init = data => {

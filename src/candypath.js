@@ -3,18 +3,19 @@ import Graphics from './graphics';
 import ipol from './ipol';
 import { Easings } from './ipol';
 
-export function CandyPath() {
+export function CandyPath({yoyo, 
+                           updateRate = 0.001 * 0.4}) {
 
-  const pathUpdateRate = 0.001 * 0.4;
+  const pathUpdateRate = updateRate;
   
   let path = new Graphics(),
       points,
-      iPath = new ipol(0, 0, {});
+      iPath = new ipol(0, 0, { yoyo });
 
-  this.init = (x, y, x2, y2) => {
+  this.init = (x, y, x2, y2, bent = 0.01) => {
     path.clear();
     path.bent(line([x, y],
-                   [x2, y2]), 0.01);
+                   [x2, y2]), bent);
 
     points = path.points();
     iPath.both(0, 1);

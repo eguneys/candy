@@ -1,12 +1,8 @@
 import { throttle } from '../util';
 import { sprite } from '../asprite';
 
-import Graphics from '../graphics';
-
-import { line } from '../dquad/geometry';
-
-import ipol from '../ipol';
-import { Easings } from '../ipol';
+import * as v from '../vec2';
+import { CandyPath } from '../candypath';
 
 import Animation from '../animation';
 
@@ -64,14 +60,21 @@ function CandyBody(play, ctx, bs) {
 
   let aBounce = new Animation(frames['bounce'], {});
 
-  let path = new Graphics(),
-      points,
-      iPath = new ipol(0, 0, { yoyo: true });
+  const SlowUpdateRate = 0.001 * 1.0,
+        FastUpdateRate = SlowUpdateRate * 2.0;
 
-  const SlowUpdateRate = 0.001,
-        FastUpdateRate = SlowUpdateRate * 2;
+  let standingPath = new CandyPath({ yoyo: true, 
+                                     updateRate: SlowUpdateRate });
 
-  let moving;
+  let movingPath = new CandyPath({ yoyo: false,
+                                   updateRate: FastUpdateRate });
+  let dashingPath = new CandyPath({ yoyo: false,
+                                    updateRate: FastUpdateRate });
+
+  let currentPath;
+
+  let BackY = height - candyWidth,
+      DashY = height - candyWidth * 10;
 
   let dBg;
   dBg = sprite(frames['candy']);
@@ -80,68 +83,39 @@ function CandyBody(play, ctx, bs) {
 
   this.init = data => {
 
+    stand([width * 0.5, BackY]);
+
     oneLayer.add(dBg);
 
-    moving = false;
-    standingPath(10);
   };
 
-  let i = 0; 
+  const stand = (from = this.currentPoint()) => {
 
-  const standingPath = (x) => {
-    path.clear();
-    path.bent(line([x, height - candyWidth],
-                   [x + candyWidth, height - candyWidth]), - 0.1);
-
-    points = path.points();
-    iPath.both(0, 1);
+    standingPath.init(from[0], from[1],
+                      from[0] + candyWidth, from[1],
+                     -0.1); 
+    currentPath = standingPath;
   };
 
-  const movingPath = (to) => {
-    let from = currentPoint();
+  const move = (x) => {
+    let from = this.currentPoint();
 
-    path.clear();
-    path.bent(line(from,
-                   [to, height - candyWidth]), 
-              Math.sign(from[0] - to) * 
-              0.1);
+    let bentSign = Math.sign(from[0] - x);
 
-    points = path.points();
-    iPath.both(0, 1);
+    movingPath.init(from[0], from[1],
+                    x, from[1], bentSign * 0.1);
+    currentPath = movingPath;
   };
 
-  const dashingPath = () => {
-    let dashY = 10;
+  const dash = (y) => {
+    let from = this.currentPoint();
 
-    let from = currentPoint();
-
-    path.clear();
-    path.bent(line(from,
-                   [from[0], height - candyWidth * dashY]), 
-              0.1);
-
-    points = path.points();
-    iPath.both(0, 1);
+    dashingPath.init(from[0], from[1],
+                     from[0], y, 0.1);
+    currentPath = dashingPath;
   };
 
-  const currentPoint = () => {
-    let iPoints = Math.floor(iPath.easing(Easings.easeInOutQuad) * (points.length - 1));
-    let point = points[iPoints];
-    return point;
-  };
-
-  this.currentPoint = currentPoint;
-
-  const moveTo = x => {
-    moving = true;
-    movingPath(x);
-  };
-
-  const dash = () => {
-    dashingPath();
-  };
-
-  const safeMoveTo = throttle(x => moveTo(x), 250);
+  this.currentPoint = () => currentPath.currentPoint();
 
   const handleMouse = () => {
     const { current } = events.data;
@@ -150,38 +124,34 @@ function CandyBody(play, ctx, bs) {
       let { epos, ending } = current;
 
       if (ending) {
-        let { swipe: { swiped, up } } = ending;
+        let { swipe: { swiped, up, down } } = ending;
 
         if (!swiped) {
-          safeMoveTo(epos[0] - candyWidth * 0.5);
+          move(epos[0]);
         } else if (up) {
-          dash();
+          dash(DashY);
+        } else if (down) {
+          dash(BackY);
         }
       }
     }
   };
 
   const updateMove = () => {
-    if (moving && iPath.settled()) {
-      moving = false;
-      standingPath(currentPoint()[0]);
+    if (currentPath === movingPath && currentPath.settled()) {
+      stand();
+    }
+    if (currentPath === dashingPath && currentPath.settled()) {
+      stand();
     }
   };
 
   const updateAnimation = delta => {
-    if (moving) {
-      aBounce.update(delta * FastUpdateRate);
-      dBg.frame = aBounce.frame();
-    } else {
-      dBg.frame = frames['candy'];
-    }
+
   };
 
   this.update = delta => {
-
-    let iPathUpdateRate = moving ? FastUpdateRate: SlowUpdateRate;
-
-    iPath.update(delta * iPathUpdateRate);
+    currentPath.update(delta);
 
     handleMouse(delta);
 
@@ -193,8 +163,7 @@ function CandyBody(play, ctx, bs) {
 
 
   this.render = () => {
-
-    let point = currentPoint();
+    let point = currentPath.currentPoint();
 
     dBg.position.set(point[0], point[1]);
 
