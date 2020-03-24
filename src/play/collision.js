@@ -9,7 +9,7 @@ export default function CandyCollision() {
   });
 
   collision.addRelation('shoot', 'lollipop', (shoot, lollipop) => {
-    console.log('shoot lollipop');
+    lollipop.damage(shoot);
   });
 
   this.candies = collision.candies;

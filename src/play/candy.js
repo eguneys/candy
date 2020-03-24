@@ -70,7 +70,7 @@ export default function Candy(play, ctx, bs) {
     lollipop.render();
     sky.render();
 
-    dCollisionView.render();
+    // dCollisionView.render();
   };
   
 }

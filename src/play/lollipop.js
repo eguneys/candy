@@ -8,6 +8,8 @@ import { withDelay } from './util';
 
 import * as mu from 'mutilz';
 
+import ipol from '../ipol';
+
 import { Easings } from '../ipol';
 
 import { CandyPath, PathCombined } from '../candypath';
@@ -123,8 +125,8 @@ function LollipopBody(play, ctx, bs) {
 
   let dBg;
   dBg = sprite(frames['candy']);
-  dBg.width = 32;
-  dBg.height = 32;
+  dBg.width = candyWidth;
+  dBg.height = candyWidth;
 
   let path1 = new CandyPath({ easing: Easings.easeOutQuad,
                               updateRate: SlowUpdateRate }),
@@ -136,8 +138,22 @@ function LollipopBody(play, ctx, bs) {
   let collisionId;
   let bodyCollisionCircle;
 
+
+  let iDamageKickbackY = new ipol(0, 0, {});
+
+  const damageShrinkFactor = candyWidth * 0.2;
+
+  let maxDamageResist,
+      damageResistFrames;
+
   this.init = data => {
+
     let x = data.x;
+
+    maxDamageResist = 20;
+    damageResistFrames = maxDamageResist;
+
+    iDamageKickbackY.both(0, 0);
 
     oneLayer.add(dBg);
 
@@ -154,10 +170,35 @@ function LollipopBody(play, ctx, bs) {
     dataCollision = data.collision;
   };
 
+  const damageScale = () => {
+    return damageResistFrames / maxDamageResist;
+  };
+
   const release = () => {
     dBg.remove();
     play.release(this);
     dataCollision.remove(collisionId);
+  };
+
+  this.damage = shoot => {
+
+    damageResistFrames--;
+    damageResistFrames = Math.max(damageResistFrames, 0);
+
+    let dValue = iDamageKickbackY.value();
+    iDamageKickbackY.both(0, dValue - 1);
+
+    dBg.tint = 0xffffab;
+
+  };
+
+  const updateDamage = () => {
+    if (iDamageKickbackY.settled()) {
+      dBg.tint = 0xffffff;
+    }
+    if (damageScale() < 0.1) {
+      release();
+    }
   };
 
   const updateCollision = () => {
@@ -167,6 +208,9 @@ function LollipopBody(play, ctx, bs) {
   };
 
   this.update = delta => {
+
+    iDamageKickbackY.update(delta * 0.01);
+    updateDamage();
     updateCollision();
 
     path.update(delta);
@@ -177,7 +221,12 @@ function LollipopBody(play, ctx, bs) {
 
 
   this.render = () => {
+    let damageY = iDamageKickbackY.value();
     let point = path.currentPoint();
-    dBg.position.set(point[0], point[1]);
+    dBg.position.set(point[0], point[1] + damageY * -4);
+
+    let damageWidth = candyWidth - (1 - damageScale()) * damageShrinkFactor;
+    dBg.width = damageWidth;
+    dBg.height = damageWidth;
   };
 }
