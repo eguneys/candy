@@ -110,6 +110,20 @@ function CandyBody(play, ctx, bs) {
     iPath.both(0, 1);
   };
 
+  const dashingPath = () => {
+    let dashY = 10;
+
+    let from = currentPoint();
+
+    path.clear();
+    path.bent(line(from,
+                   [from[0], height - candyWidth * dashY]), 
+              0.1);
+
+    points = path.points();
+    iPath.both(0, 1);
+  };
+
   const currentPoint = () => {
     let iPoints = Math.floor(iPath.easing(Easings.easeInOutQuad) * (points.length - 1));
     let point = points[iPoints];
@@ -123,21 +137,26 @@ function CandyBody(play, ctx, bs) {
     movingPath(x);
   };
 
+  const dash = () => {
+    dashingPath();
+  };
+
   const safeMoveTo = throttle(x => moveTo(x), 250);
 
   const handleMouse = () => {
     const { current } = events.data;
 
     if (current) {
-      let { tapping, epos, ending } = current;
-
-      if (tapping) {
-        safeMoveTo(epos[0] - candyWidth * 0.5);
-      }
+      let { epos, ending } = current;
 
       if (ending) {
-        let { swipe } = ending;
-        console.log(swipe);
+        let { swipe: { swiped, up } } = ending;
+
+        if (!swiped) {
+          safeMoveTo(epos[0] - candyWidth * 0.5);
+        } else if (up) {
+          dash();
+        }
       }
     }
   };

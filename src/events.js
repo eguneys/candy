@@ -117,18 +117,27 @@ export default function Events(canvas) {
   }
 
   const swipePosition = pos => {
+    let res = {
+      
+    };
     let threshold = 80;
 
     if (pos[1] < -threshold) {
-      return 'up';
+      res.up = true;
     } else if (pos[1] > threshold) {
-      return 'down';
-    } else if (pos[0] < -threshold) {
-      return 'left';
-    } else if (pos[0] > threshold) {
-      return 'right';
+      res.down = true;
     }
-    return null;
+    if (pos[0] < -threshold) {
+      res.left = true;
+    } else if (pos[0] > threshold) {
+      res.right = true;
+    }
+
+    if (res.up || res.down || res.left || res.right) {
+      res.swiped = true;
+    }
+
+    return res;
   };
 
   function endTouch(state) {
@@ -138,7 +147,9 @@ export default function Events(canvas) {
 
         let swipe = swipePosition(dpos);
 
-        state.current.ending = {swipe};
+        state.current.ending = {
+          swipe
+        };
       }
     };
   }
