@@ -30,9 +30,12 @@ export default function CandyCollisionView(play, ctx, bs) {
   };
 
   this.update = delta => {
-    dCollisions.releaseAll(_ => {
-      _.remove();
-    });
+  };
+
+
+  this.render = () => {
+    dCollisions.each(_ => _.remove());
+    dCollisions.releaseAll();
 
     collision.candies('candy', (circle, item) => {
       addCircle(circle, frames['white']);
@@ -46,8 +49,5 @@ export default function CandyCollisionView(play, ctx, bs) {
       addCircle(circle, frames['white']);
     });
   };
-
-
-  this.render = () => {};
   
 }

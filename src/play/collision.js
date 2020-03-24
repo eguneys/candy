@@ -16,15 +16,21 @@ export default function CandyCollision() {
   this.update = collision.update;
 
   this.addCandy = (candy, circle) => {
-    collision.addCandy('candy', circle, candy);
+    return collision.addCandy('candy', circle, candy);
   };
+
+  this.removeCandy = (id) => collision.removeCandy('candy', id);
 
   this.addLollipop = (lollipop, circle) => {
-    collision.addCandy('lollipop', circle, lollipop);
+    return collision.addCandy('lollipop', circle, lollipop);
   };
 
+  this.removeLollipop = (id) => collision.removeCandy('lollipop', id);
+
   this.addShoot = (shoot, circle) => {
-    collision.addCandy('shoot', circle, shoot);
+    return collision.addCandy('shoot', circle, shoot);
   };
+
+  this.removeShoot = (id) => collision.removeCandy('shoot', id);
 
 }

@@ -84,6 +84,8 @@ function Bullet(play, ctx, bs) {
       points,
       iPath = new ipol(0, 0, {});
 
+  let collisionId,
+      dataCollision;
   let bodyCollisionCircle;
 
   this.init = data => {
@@ -96,7 +98,8 @@ function Bullet(play, ctx, bs) {
     shootPath(x, y, bent);
 
     bodyCollisionCircle = circle(0, 0, bulletWidth * 0.5);
-    data.collision(this, bodyCollisionCircle);
+    collisionId = data.collision.add(this, bodyCollisionCircle);
+    dataCollision = data.collision;
   };
 
   const currentPoint = () => {
@@ -117,6 +120,7 @@ function Bullet(play, ctx, bs) {
   const release = () => {
     dBg.remove();
     play.release(this);
+    dataCollision.remove(collisionId);
   };
 
   const updateCollision = () => {

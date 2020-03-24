@@ -37,9 +37,18 @@ export default function Candy(play, ctx, bs) {
 
     dCollisionView.init({ collision });
 
-    body.init({collision: collision.addCandy });
-    shoot.init({collision: collision.addShoot });
-    lollipop.init({collision: collision.addLollipop });
+    body.init({collision: {
+      add: collision.addCandy,
+      remove: collision.removeCandy
+    }});
+    shoot.init({collision: {
+      add: collision.addShoot,
+      remove: collision.removeShoot
+    } });
+    lollipop.init({collision: {
+      add: collision.addLollipop,
+      remove: collision.removeLollipop
+    }});
     sky.init({});
     scene.background(0.1, 0.2, 0.2);
   };
@@ -108,7 +117,7 @@ function CandyBody(play, ctx, bs) {
     stand([x, y]);
 
     bodyCollisionCircle = circle(x, y, candyWidth * 0.5);
-    data.collision(this, bodyCollisionCircle);
+    data.collision.add(this, bodyCollisionCircle);
 
     oneLayer.add(dBg);
 

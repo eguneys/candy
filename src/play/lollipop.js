@@ -132,6 +132,8 @@ function LollipopBody(play, ctx, bs) {
                               updateRate: FastUpdateRate }),
       path = new PathCombined();
 
+  let dataCollision;
+  let collisionId;
   let bodyCollisionCircle;
 
   this.init = data => {
@@ -148,12 +150,14 @@ function LollipopBody(play, ctx, bs) {
     path.init([path1, path2]);
 
     bodyCollisionCircle = circle(0, 0, candyWidth * 0.5);
-    data.collision(this, bodyCollisionCircle);
+    collisionId = data.collision.add(this, bodyCollisionCircle);
+    dataCollision = data.collision;
   };
 
   const release = () => {
     dBg.remove();
     play.release(this);
+    dataCollision.remove(collisionId);
   };
 
   const updateCollision = () => {
