@@ -1,5 +1,5 @@
 export const withDelay = (fn, delay, updateFn) => {
-  let lastUpdate = 0;
+  let lastUpdate = delay;
 
   return (delta) => {
     lastUpdate += delta;
