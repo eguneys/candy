@@ -36,6 +36,7 @@ export function app(element, options) {
       play.init({});
 
       new Loop(delta => {
+        events.update(delta);
         play.update(delta);
         play.render();
         canvas.scene.render();

@@ -1,3 +1,4 @@
+import { throttle } from '../util';
 import { sprite } from '../asprite';
 
 import Graphics from '../graphics';
@@ -5,14 +6,51 @@ import Graphics from '../graphics';
 import { line } from '../dquad/geometry';
 
 import ipol from '../ipol';
-
 import { Easings } from '../ipol';
 
 import Animation from '../animation';
 
+import CandyShoot from './shoot';
+import Lollipop from './lollipop';
+
 export default function Candy(play, ctx, bs) {
 
   const { canvas, 
+          events,
+          layers: { scene, zeroLayer }, 
+          frames } = ctx;
+
+  let body = new CandyBody(this, ctx, bs);
+  let shoot = new CandyShoot(this, ctx, bs);
+  let lollipop = new Lollipop(this, ctx, bs);
+
+  this.currentPoint = body.currentPoint;
+
+  this.init = data => {
+    body.init({});
+    shoot.init({});
+    lollipop.init({});
+  };
+
+  this.update = delta => {
+    body.update(delta);
+    shoot.update(delta);
+    lollipop.update(delta);
+  };
+
+
+  this.render = () => {
+    body.render();
+    shoot.render();
+    lollipop.render();
+  };
+  
+}
+
+function CandyBody(play, ctx, bs) {
+
+  const { canvas, 
+          events,
           layers: { scene, zeroLayer }, 
           frames } = ctx;
 
@@ -30,13 +68,13 @@ export default function Candy(play, ctx, bs) {
   let moving;
 
   let dBg;
+  dBg = sprite(frames['candy']);
+  dBg.width = 32;
+  dBg.height = 32;
 
   this.init = data => {
-    dBg = sprite(frames['candy']);
-    dBg.width = 32;
-    dBg.height = 32;
-    zeroLayer.add(dBg);
 
+    zeroLayer.add(dBg);
 
     moving = false;
     standingPath(10);
@@ -72,16 +110,30 @@ export default function Candy(play, ctx, bs) {
     return point;
   };
 
+  this.currentPoint = currentPoint;
+
   const moveTo = x => {
     moving = true;
     movingPath(x);
   };
 
-  const maybeMove = () => {
-    if (!moving && Math.random() < 0.05) {
-      let i = Math.random() * (width - candyWidth);
-      moveTo(i);
+  const safeMoveTo = throttle(x => moveTo(x), 250);
+
+  const handleMouse = () => {
+    const { current } = events.data;
+
+    if (current) {
+      let { tapping, epos } = current;
+
+      if (tapping) {
+
+        safeMoveTo(epos[0] - candyWidth * 0.5);
+
+      }
     }
+  };
+
+  const updateMove = () => {
     if (moving && iPath.settled()) {
       moving = false;
       standingPath(currentPoint()[0]);
@@ -103,7 +155,9 @@ export default function Candy(play, ctx, bs) {
 
     iPath.update(delta * iPathUpdateRate);
 
-    maybeMove();
+    handleMouse(delta);
+
+    updateMove();
 
     updateAnimation(delta);
 
