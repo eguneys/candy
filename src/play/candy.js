@@ -38,7 +38,7 @@ export default function Candy(play, ctx, bs) {
     dCollisionView.init({ collision });
 
     body.init({collision: collision.addCandy });
-    shoot.init({collision: collision.addLollipop });
+    shoot.init({collision: collision.addShoot });
     lollipop.init({collision: collision.addLollipop });
     sky.init({});
     scene.background(0.1, 0.2, 0.2);

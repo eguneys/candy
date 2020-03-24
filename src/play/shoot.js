@@ -2,6 +2,8 @@ import Pool from 'poolf';
 
 import { sprite } from '../asprite';
 
+import { circle } from '../dquad/geometry';
+
 import Graphics from '../graphics';
 
 import { line } from '../dquad/geometry';
@@ -22,7 +24,10 @@ export default function CandyShoot(play, ctx, bs) {
 
   let pool = new Pool(() => new Bullet(this, ctx, bs));
 
+  let collision;
+
   this.init = data => {
+    collision = data.collision;
   };
 
   const spawn = (x, y, bent) => {
@@ -30,7 +35,8 @@ export default function CandyShoot(play, ctx, bs) {
     pool.acquire(_ => _.init({
       x,
       y,
-      bent
+      bent,
+      collision
     }));
   };
 
@@ -66,15 +72,19 @@ function Bullet(play, ctx, bs) {
 
   const shootUpdateRate = 0.001 * 2;
 
+  const bulletWidth = 16;
+
   let dBg;
 
   dBg = sprite(frames['candy']);
-  dBg.width = 16;
-  dBg.height = 16;
+  dBg.width = bulletWidth;
+  dBg.height = bulletWidth;
 
   let path = new Graphics(),
       points,
       iPath = new ipol(0, 0, {});
+
+  let bodyCollisionCircle;
 
   this.init = data => {
     let x = data.x,
@@ -84,6 +94,9 @@ function Bullet(play, ctx, bs) {
     oneLayer.add(dBg);
     
     shootPath(x, y, bent);
+
+    bodyCollisionCircle = circle(0, 0, bulletWidth * 0.5);
+    data.collision(this, bodyCollisionCircle);
   };
 
   const currentPoint = () => {
@@ -106,12 +119,20 @@ function Bullet(play, ctx, bs) {
     play.release(this);
   };
 
+  const updateCollision = () => {
+    let p = currentPoint();
+    bodyCollisionCircle.move(p[0] + bulletWidth * 0.25, 
+                             p[1] + bulletWidth * 0.25);    
+  };
+
   this.update = delta => {
     iPath.update(delta * shootUpdateRate);
 
     if (iPath.settled()) {
       release();
     }
+
+    updateCollision();
   };
 
 

@@ -41,6 +41,10 @@ export default function CandyCollisionView(play, ctx, bs) {
     collision.candies('lollipop', (circle, item) => {
       addCircle(circle, frames['white']);
     });
+
+    collision.candies('shoot', (circle, item) => {
+      addCircle(circle, frames['white']);
+    });
   };
 
 

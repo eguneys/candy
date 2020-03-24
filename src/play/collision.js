@@ -5,7 +5,11 @@ export default function CandyCollision() {
   let collision = new Collision();
 
   collision.addRelation('candy', 'lollipop', (body, lollipop) => {
-    console.log(body, 'x', lollipop);
+    //console.log(body, 'x', lollipop);
+  });
+
+  collision.addRelation('shoot', 'lollipop', (shoot, lollipop) => {
+    console.log('shoot lollipop');
   });
 
   this.candies = collision.candies;
@@ -17,6 +21,10 @@ export default function CandyCollision() {
 
   this.addLollipop = (lollipop, circle) => {
     collision.addCandy('lollipop', circle, lollipop);
+  };
+
+  this.addShoot = (shoot, circle) => {
+    collision.addCandy('shoot', circle, shoot);
   };
 
 }

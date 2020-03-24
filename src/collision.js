@@ -50,6 +50,10 @@ export default function Collision() {
       objForeach(relation, (key2, onCrush) => {
         let checkCandies1 = candies[key1],
             checkCandies2 = candies[key2];
+
+        if (!checkCandies1 || !checkCandies2) {
+          return;
+        }
         
         objForeach(checkCandies1, (_, { circle: c1, item: item1 }) => {
           objForeach(checkCandies2, (_, { circle: c2, item: item2 }) => {
