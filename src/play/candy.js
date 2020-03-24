@@ -1,8 +1,13 @@
 import { throttle } from '../util';
 import { sprite } from '../asprite';
 
+import { circle } from '../dquad/geometry';
+
 import * as v from '../vec2';
 import { CandyPath } from '../candypath';
+
+import CandyCollision from './collision';
+import CandyCollisionView from './collisionview';
 
 import Animation from '../animation';
 
@@ -22,13 +27,19 @@ export default function Candy(play, ctx, bs) {
   let lollipop = new Lollipop(this, ctx, bs);
   let sky = new Sky(this, ctx, bs);
 
+  let dCollisionView = new CandyCollisionView(this, ctx, bs);
+  let collision = new CandyCollision();
+
   this.body = body;
   this.currentPoint = body.currentPoint;
 
   this.init = data => {
-    body.init({});
-    shoot.init({});
-    lollipop.init({});
+
+    dCollisionView.init({ collision });
+
+    body.init({collision: collision.addCandy });
+    shoot.init({collision: collision.addLollipop });
+    lollipop.init({collision: collision.addLollipop });
     sky.init({});
     scene.background(0.1, 0.2, 0.2);
   };
@@ -38,6 +49,9 @@ export default function Candy(play, ctx, bs) {
     shoot.update(delta);
     lollipop.update(delta);
     sky.update(delta);
+
+    collision.update(delta);
+    dCollisionView.update(delta);
   };
 
 
@@ -46,6 +60,8 @@ export default function Candy(play, ctx, bs) {
     shoot.render();
     lollipop.render();
     sky.render();
+
+    dCollisionView.render();
   };
   
 }
@@ -82,9 +98,17 @@ function CandyBody(play, ctx, bs) {
   dBg.width = 32;
   dBg.height = 32;
 
+  let bodyCollisionCircle;
+
   this.init = data => {
 
-    stand([width * 0.5, BackY]);
+    let x = width * 0.5,
+        y = BackY;
+
+    stand([x, y]);
+
+    bodyCollisionCircle = circle(x, y, candyWidth * 0.5);
+    data.collision(this, bodyCollisionCircle);
 
     oneLayer.add(dBg);
 
@@ -151,6 +175,12 @@ function CandyBody(play, ctx, bs) {
     }
   };
 
+  const updateCollision = () => {
+    let p = this.currentPoint();
+    bodyCollisionCircle.move(p[0] + candyWidth * 0.25, 
+                             p[1] + candyWidth * 0.25);
+  };
+
   const updateAnimation = delta => {
 
   };
@@ -159,6 +189,8 @@ function CandyBody(play, ctx, bs) {
     currentPath.update(delta);
 
     handleMouse(delta);
+
+    updateCollision();
 
     updateMove();
 

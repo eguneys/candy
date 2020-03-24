@@ -5,6 +5,11 @@ export default function Circle(x, y, radius) {
 
   let P = this.P = [x, y];
 
+  this.move = (newX, newY) => {
+    x = this.x = newX;
+    y = this.y = newY;
+  };
+
   this.containsRect = rect => 
   this.containsPoint(rect.A[0], rect.A[1]) &&
     this.containsPoint(rect.B[0], rect.B[1]) &&
@@ -16,6 +21,17 @@ export default function Circle(x, y, radius) {
     let dy = (y - b) * (y - b);
     return (dx + dy) <= (radius * radius);    
   };
+
+  // (x2-x1)^2 + (y1-y2)^2 <= (r1+r2)^2
+  this.intersectsCircle = circle => {
+    let dx = circle.x - x,
+        dy = circle.y - y,
+        dr = circle.radius + radius;
+
+    return dx * dx + dy * dy <= dr * dr;
+  };
+  
+
 
   this.intersectsRect = rect =>
   rect.containsPoint(P) ||

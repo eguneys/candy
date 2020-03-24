@@ -23,7 +23,27 @@ export default function makeSprites(scene, assets) {
   const candyFrame = makeFrame(candyAtlas);
 
   return {
+    white: scene.texture(bgTexture('white')),
     candy: candyFrame(0, 0, 32),
     bounce: animation(candyFrame, 0, 0, 32, 6)
   };
+}
+
+
+const bgTexture = (color) => {
+  return withCanvasTexture(256, 256, (w, h, canvas, ctx) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, w, h);
+    return canvas;
+  });
+};
+
+function withCanvasTexture(width, height, f) {
+  var canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  f(width, height, canvas, canvas.getContext('2d'));
+
+  let texture = canvas;
+  return texture;
 }

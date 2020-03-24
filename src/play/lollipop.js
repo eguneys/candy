@@ -2,6 +2,8 @@ import Pool from 'poolf';
 
 import { sprite } from '../asprite';
 
+import { circle } from '../dquad/geometry';
+
 import { withDelay } from './util';
 
 import * as mu from 'mutilz';
@@ -16,7 +18,10 @@ export default function Lollipop(play, ctx, bs) {
 
   let pool = new Pool(() => new LollipopGang(this, ctx, bs));
 
+  let collision;
+
   this.init = data => {
+    collision = data.collision;
   };
 
   this.release = (gang) => {
@@ -25,7 +30,10 @@ export default function Lollipop(play, ctx, bs) {
 
   const spawn = () => {
     let x = mu.rand(0, width - 32);
-    pool.acquire(_ => _.init({x}));
+    pool.acquire(_ => _.init({
+      x,
+      collision
+    }));
   };
 
   const maybeSpawn = withDelay(() => {
@@ -54,14 +62,19 @@ function LollipopGang(play, ctx, bs) {
 
   let x;
 
+  let collision;
 
   this.init = data => {
+    collision = data.collision;
     spawnCount = 0;
     x = data.x;
   };
 
   const spawn = (x) => {    
-    pool.acquire(_ => _.init({x}));
+    pool.acquire(_ => _.init({
+      x,
+      collision
+    }));
   };
 
 
@@ -106,7 +119,7 @@ function LollipopBody(play, ctx, bs) {
           layers: { scene, oneLayer }, 
           frames } = ctx;
 
-  const { width, height } = bs;
+  const { width, height, candy: { width: candyWidth } } = bs;
 
   let dBg;
   dBg = sprite(frames['candy']);
@@ -119,6 +132,8 @@ function LollipopBody(play, ctx, bs) {
                               updateRate: FastUpdateRate }),
       path = new PathCombined();
 
+  let bodyCollisionCircle;
+
   this.init = data => {
     let x = data.x;
 
@@ -126,11 +141,14 @@ function LollipopBody(play, ctx, bs) {
 
     let edgeX = x < width * 0.5 ? width : 0;
 
-    path1.init(x, - 32,
-               x, height - 32);
-    path2.init(x, height - 32,
+    path1.init(x, - candyWidth,
+               x, height - candyWidth);
+    path2.init(x, height - candyWidth,
                edgeX, 0);
     path.init([path1, path2]);
+
+    bodyCollisionCircle = circle(0, 0, candyWidth * 0.5);
+    data.collision(this, bodyCollisionCircle);
   };
 
   const release = () => {
@@ -138,7 +156,15 @@ function LollipopBody(play, ctx, bs) {
     play.release(this);
   };
 
+  const updateCollision = () => {
+    let p = path.currentPoint();
+    bodyCollisionCircle.move(p[0] + candyWidth * 0.25, 
+                             p[1] + candyWidth * 0.25);
+  };
+
   this.update = delta => {
+    updateCollision();
+
     path.update(delta);
     if (path2.settled()) {
       release(); 
