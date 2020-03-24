@@ -31,7 +31,7 @@ export default function Lollipop(play, ctx, bs) {
 
   const maybeSpawn = withDelay(() => {
     spawn(0, 0);
-  }, 2000);
+  }, 3000);
 
   this.update = delta => {
     maybeSpawn(delta);

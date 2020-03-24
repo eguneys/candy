@@ -12,6 +12,7 @@ import Animation from '../animation';
 
 import CandyShoot from './shoot';
 import Lollipop from './lollipop';
+import Sky from './sky';
 
 export default function Candy(play, ctx, bs) {
 
@@ -23,6 +24,7 @@ export default function Candy(play, ctx, bs) {
   let body = new CandyBody(this, ctx, bs);
   let shoot = new CandyShoot(this, ctx, bs);
   let lollipop = new Lollipop(this, ctx, bs);
+  let sky = new Sky(this, ctx, bs);
 
   this.currentPoint = body.currentPoint;
 
@@ -30,12 +32,15 @@ export default function Candy(play, ctx, bs) {
     body.init({});
     shoot.init({});
     lollipop.init({});
+    sky.init({});
+    scene.background(0.1, 0.2, 0.2);
   };
 
   this.update = delta => {
     body.update(delta);
     shoot.update(delta);
     lollipop.update(delta);
+    sky.update(delta);
   };
 
 
@@ -43,6 +48,7 @@ export default function Candy(play, ctx, bs) {
     body.render();
     shoot.render();
     lollipop.render();
+    sky.render();
   };
   
 }
@@ -51,7 +57,7 @@ function CandyBody(play, ctx, bs) {
 
   const { canvas, 
           events,
-          layers: { scene, zeroLayer }, 
+          layers: { scene, oneLayer }, 
           frames } = ctx;
 
   let { width, height, candy: { width: candyWidth } } = bs;
@@ -74,7 +80,7 @@ function CandyBody(play, ctx, bs) {
 
   this.init = data => {
 
-    zeroLayer.add(dBg);
+    oneLayer.add(dBg);
 
     moving = false;
     standingPath(10);
