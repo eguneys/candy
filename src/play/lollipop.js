@@ -6,6 +6,8 @@ import { withDelay } from './util';
 
 import * as mu from 'mutilz';
 
+import { Easings } from '../ipol';
+
 import { CandyPath, PathCombined } from '../candypath';
 
 export default function Lollipop(play, ctx, bs) {
@@ -26,12 +28,32 @@ export default function Lollipop(play, ctx, bs) {
     pool.release(bullet);
   };
 
+  const maybeSpawnNone = withDelay(() => {
+  }, 10000);
+
+  let spawnFunctionCustomData;
+
+  let spawnFunctionResetCounter;
+  let spawnFunction = maybeSpawnNone;
+
+  const maybeSpawnOne = withDelay(() => {
+    spawnFunctionResetCounter--;
+    spawn(spawnFunctionCustomData);
+    if (spawnFunctionResetCounter < 0) {
+      spawnFunction = maybeSpawnNone;
+    }
+  }, 500);
+
   const maybeSpawn = withDelay(() => {
-    spawn(mu.rand(32 * 2, width - 32 * 2));
-  }, 1000);
+    spawnFunctionResetCounter = 5;
+    spawnFunctionCustomData = mu.rand(32 * 2, width - 32 * 2);
+    spawnFunction = maybeSpawnOne;
+  }, 10000);
 
   this.update = delta => {
     maybeSpawn(delta);
+    spawnFunction(delta);
+
     pool.each(_ => _.update(delta));
   };
 
@@ -46,6 +68,10 @@ function LollipopBody(play, ctx, bs) {
 
   const { canvas, 
           events,
+          config: {
+            SlowUpdateRate,
+            FastUpdateRate
+          },
           layers: { scene, oneLayer }, 
           frames } = ctx;
 
@@ -56,20 +82,27 @@ function LollipopBody(play, ctx, bs) {
   dBg.width = 32;
   dBg.height = 32;
 
-  let path1 = new CandyPath({}),
-      path2 = new CandyPath({}),
+  let dBg2;
+  dBg2 = sprite(frames['candy']);
+  dBg2.width = 32;
+  dBg2.height = 32;
+
+  let path1 = new CandyPath({ easing: Easings.easeOutQuad,
+                              updateRate: SlowUpdateRate }),
+      path2 = new CandyPath({ updateRate: FastUpdateRate }),
       path = new PathCombined();
 
   this.init = data => {
     let x = data.x;
 
     oneLayer.add(dBg);
-    
-    let edgeX = mu.arand([0, width]);
+    oneLayer.add(dBg2);
 
-    path1.init(x, 0,
-               x, height);
-    path2.init(x, height,
+    let edgeX = x < width * 0.5 ? 0 : width;
+
+    path1.init(x, - 32,
+               x, height - 32);
+    path2.init(x, height - 32,
                edgeX, 0);
     path.init([path1, path2]);
   };

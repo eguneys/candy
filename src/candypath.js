@@ -4,6 +4,7 @@ import ipol from './ipol';
 import { Easings } from './ipol';
 
 export function CandyPath({yoyo, 
+                           easing = Easings.easeInOutQuad,
                            updateRate = 0.001 * 0.4}) {
 
   const pathUpdateRate = updateRate;
@@ -23,9 +24,14 @@ export function CandyPath({yoyo,
 
   this.settled = () => iPath.settled();
 
-  const currentPoint = this.currentPoint = () => {
-    let iPoints = Math.floor(iPath.easing(Easings.easeInOutQuad) * 
+  const currentPoint = this.currentPoint = (offset = 0) => {
+    let iPoints = Math.floor(iPath.easing(easing) *
                              (points.length - 1));
+
+    iPoints += offset;
+    iPoints = Math.min(iPoints, points.length - 1);
+    iPoints = Math.max(iPoints, 0);
+
     let point = points[iPoints];
     return point;
   };
@@ -54,8 +60,8 @@ export function PathCombined() {
     }
   };
 
-  this.currentPoint = () => {
-    return currentPath().currentPoint();
+  this.currentPoint = (n) => {
+    return currentPath().currentPoint(n);
   };
 
   this.update = delta => {

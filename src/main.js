@@ -2,6 +2,7 @@ import Loop from 'loopz';
 import Assets from './assets';
 import Events from './events';
 import Canvas from './canvas';
+import Config from './config';
 
 import makeLayers from './layers';
 import makeFrames from './sprites';
@@ -24,7 +25,10 @@ export function app(element, options) {
 
       const frames = makeFrames(canvas.scene, assets);
 
+      const config = Config(options);
+
       const context = {
+        config,
         events,
         assets,
         canvas,

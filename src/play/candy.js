@@ -22,6 +22,7 @@ export default function Candy(play, ctx, bs) {
   let lollipop = new Lollipop(this, ctx, bs);
   let sky = new Sky(this, ctx, bs);
 
+  this.body = body;
   this.currentPoint = body.currentPoint;
 
   this.init = data => {
@@ -117,6 +118,8 @@ function CandyBody(play, ctx, bs) {
 
   this.currentPoint = () => currentPath.currentPoint();
 
+  this.dashing = () => currentPath === dashingPath;
+
   const handleMouse = () => {
     const { current } = events.data;
 
@@ -127,7 +130,9 @@ function CandyBody(play, ctx, bs) {
         let { swipe: { swiped, up, down } } = ending;
 
         if (!swiped) {
+
           move(epos[0]);
+
         } else if (up) {
           dash(DashY);
         } else if (down) {

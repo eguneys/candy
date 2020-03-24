@@ -27,6 +27,8 @@ export default function Sky(play, ctx, bs) {
     pool.acquire(_ => _.init({x}));
   };
 
+  this.dashing = () => play.body.dashing();
+
   this.release = (bullet) => {
     pool.release(bullet);
   };
@@ -66,6 +68,8 @@ function Clouds(play, ctx, bs) {
   dBg.height = 16;
   dBg.alpha = 0.1;
 
+  let dashBoost;
+
   let path = new Graphics(),
       points,
       iPath = new ipol(0, 0, {});
@@ -102,7 +106,9 @@ function Clouds(play, ctx, bs) {
   };
 
   this.update = delta => {
-    iPath.update(delta * PathUpdateRate);
+    let dashBoost = play.dashing() ? 2.0: 1.0;
+
+    iPath.update(delta * PathUpdateRate * dashBoost);
 
     updateAnimation(delta);
 
