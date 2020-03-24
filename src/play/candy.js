@@ -129,12 +129,15 @@ function CandyBody(play, ctx, bs) {
     const { current } = events.data;
 
     if (current) {
-      let { tapping, epos } = current;
+      let { tapping, epos, ending } = current;
 
       if (tapping) {
-
         safeMoveTo(epos[0] - candyWidth * 0.5);
+      }
 
+      if (ending) {
+        let { swipe } = ending;
+        console.log(swipe);
       }
     }
   };

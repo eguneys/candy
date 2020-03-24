@@ -33,7 +33,7 @@ export default function Sky(play, ctx, bs) {
 
   const maybeSpawn = withDelay(() => {
     spawn(mu.rand(0, width));
-  }, 200);
+  }, 500);
 
   this.update = delta => {
     maybeSpawn(delta);
@@ -62,8 +62,9 @@ function Clouds(play, ctx, bs) {
   
   let dBg;
   dBg = sprite(frames['candy']);
-  dBg.width = 8;
-  dBg.height = 8;
+  dBg.width = 16;
+  dBg.height = 16;
+  dBg.alpha = 0.1;
 
   let path = new Graphics(),
       points,

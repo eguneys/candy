@@ -116,9 +116,30 @@ export default function Events(canvas) {
     };
   }
 
+  const swipePosition = pos => {
+    let threshold = 80;
+
+    if (pos[1] < -threshold) {
+      return 'up';
+    } else if (pos[1] > threshold) {
+      return 'down';
+    } else if (pos[0] < -threshold) {
+      return 'left';
+    } else if (pos[0] > threshold) {
+      return 'right';
+    }
+    return null;
+  };
+
   function endTouch(state) {
     return function(e) {
-      state.current.ending = {};
+      if (state.current) {
+        let { dpos } = state.current;
+
+        let swipe = swipePosition(dpos);
+
+        state.current.ending = {swipe};
+      }
     };
   }
 
