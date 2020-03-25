@@ -59,6 +59,10 @@ export function PathCombined() {
     current = 0;
   };
 
+  this.settled = () => lastPath().settled();
+
+  const lastPath = () => paths[paths.length - 1];
+
   const currentPath = () => paths[current];
 
   const nextPath = () => {
