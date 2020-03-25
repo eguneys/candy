@@ -19,11 +19,15 @@ const animation = (fM, x, y, w, n) => {
 export default function makeSprites(scene, assets) {
 
   const candyAtlas = scene.texture(assets['candy']);
+  const explosionAtlas = scene.texture(assets['explosion']);
 
   const candyFrame = makeFrame(candyAtlas);
+  const explosionFrame = makeFrame(explosionAtlas);
 
   return {
     white: scene.texture(bgTexture('white')),
+    shoot: wholeFrame(scene, assets['shoot'], 32),
+    explosion: animation(explosionFrame, 0, 0, 32, 7),
     candy: candyFrame(0, 0, 32),
     bounce: animation(candyFrame, 0, 0, 32, 6)
   };

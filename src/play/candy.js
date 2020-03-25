@@ -14,6 +14,7 @@ import Animation from '../animation';
 import CandyShoot from './shoot';
 import Lollipop from './lollipop';
 import Sky from './sky';
+import Explosion from './explosion';
 
 export default function Candy(play, ctx, bs) {
 
@@ -45,11 +46,13 @@ export default function Candy(play, ctx, bs) {
       add: collision.addShoot,
       remove: collision.removeShoot
     } });
+
     lollipop.init({collision: {
       add: collision.addLollipop,
       remove: collision.removeLollipop
     }});
     sky.init({});
+
     scene.background(0.1, 0.2, 0.2);
   };
 
@@ -85,7 +88,7 @@ function CandyBody(play, ctx, bs) {
               FastUpdateRate
             }
           },
-          layers: { scene, oneLayer }, 
+          layers: { scene, twoLayer }, 
           frames } = ctx;
 
   let { width, height, candy: { width: candyWidth } } = bs;
@@ -96,7 +99,7 @@ function CandyBody(play, ctx, bs) {
                                      updateRate: SlowUpdateRate });
 
   let movingPath = new CandyPath({ yoyo: false,
-                                   updateRate: FastUpdateRate });
+                                   updateRate: FastUpdateRate * 2.0 });
   let dashingPath = new CandyPath({ yoyo: false,
                                     updateRate: FastUpdateRate });
 
@@ -122,14 +125,14 @@ function CandyBody(play, ctx, bs) {
     bodyCollisionCircle = circle(x, y, candyWidth * 0.5);
     data.collision.add(this, bodyCollisionCircle);
 
-    oneLayer.add(dBg);
+    twoLayer.add(dBg);
 
   };
 
   const stand = (from = this.currentPoint()) => {
 
     standingPath.init(from[0], from[1],
-                      from[0] + candyWidth, from[1],
+                      from[0] + candyWidth * 0.5, from[1],
                      -0.1); 
     currentPath = standingPath;
   };

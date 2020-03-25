@@ -65,8 +65,7 @@ export default function LolliGenelBody(play, ctx, bs) {
     dataCollision.remove(collisionId);
   };
 
-  this.damage = shoot => {
-
+  const damage = () => {
     damageResistFrames--;
     damageResistFrames = Math.max(damageResistFrames, 0);
 
@@ -74,6 +73,11 @@ export default function LolliGenelBody(play, ctx, bs) {
     iDamageKickbackY.both(0, dValue - 1);
 
     dBg.tint = 0xffffab;
+  };
+
+  this.damage = shoot => {
+
+    damage();
 
   };
 

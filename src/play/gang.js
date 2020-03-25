@@ -2,13 +2,9 @@ import Pool from 'poolf';
 
 import { withDelay } from './util';
 
-import { LolliBody1, LolliBody2 } from './lolli';
+export default function LollipopGang(play, ctx, bs, Maker) {
 
-export default function LollipopGang(play, ctx, bs) {
-
-  const { width } = bs;
-
-  let pool = new Pool(() => new LolliBody2(this, ctx, bs));
+  let pool = new Pool(() => new Maker(this, ctx, bs));
   
   let spawnCount;
 

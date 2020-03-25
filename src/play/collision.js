@@ -10,6 +10,7 @@ export default function CandyCollision() {
 
   collision.addRelation('shoot', 'lollipop', (shoot, lollipop) => {
     lollipop.damage(shoot);
+    shoot.damage();
   });
 
   this.candies = collision.candies;

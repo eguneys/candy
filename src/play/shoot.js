@@ -20,7 +20,7 @@ export default function CandyShoot(play, ctx, bs) {
           layers: { scene, zeroLayer }, 
           frames } = ctx;
 
-  let { candy: { width: candyWidth } } = bs;
+  let { bulletWidth, candy: { width: candyWidth } } = bs;
 
   let pool = new Pool(() => new Bullet(this, ctx, bs));
 
@@ -47,9 +47,9 @@ export default function CandyShoot(play, ctx, bs) {
   const maybeSpawn = withDelay(() => {
     let p = play.currentPoint();
 
-    spawn(p[0], p[1], -2);
-    spawn(p[0] + candyWidth - 16, p[1], 2);
-  }, 200);
+    spawn(p[0] - bulletWidth * 0.25, p[1], -2);
+    spawn(p[0] + candyWidth - bulletWidth * 0.75, p[1], 2);
+  }, 100);
 
   this.update = delta => {
     maybeSpawn(delta);
@@ -72,11 +72,11 @@ function Bullet(play, ctx, bs) {
 
   const shootUpdateRate = 0.001 * 2;
 
-  const bulletWidth = 16;
+  const { bulletWidth } = bs;
 
   let dBg;
 
-  dBg = sprite(frames['candy']);
+  dBg = sprite(frames['shoot']);
   dBg.width = bulletWidth;
   dBg.height = bulletWidth;
 
@@ -117,6 +117,10 @@ function Bullet(play, ctx, bs) {
     iPath.both(0, 1);
   };
 
+  this.damage = () => {
+    release();
+  };
+
   const release = () => {
     dBg.remove();
     play.release(this);
@@ -143,6 +147,9 @@ function Bullet(play, ctx, bs) {
   this.render = () => {
     let point = currentPoint();
     dBg.position.set(point[0], point[1]);
+
+    let alpha = 1.0 - 0.8 * iPath.progress() * iPath.progress();
+    dBg.alpha = alpha;
   };
   
 }

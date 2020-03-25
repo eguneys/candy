@@ -20,6 +20,7 @@ export default function Play(ctx) {
     return {
       width,
       height,
+      bulletWidth: 32,
       candy
     };
   })();

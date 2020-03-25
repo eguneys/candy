@@ -4,22 +4,29 @@ import { withDelay } from './util';
 
 import * as mu from 'mutilz';
 
-import LollipopGang from './gang';
+import Licker from './licker';
 
 export default function Lollipop(play, ctx, bs) {
 
   const { width } = bs;
 
-  let pool = new Pool(() => new LollipopGang(this, ctx, bs));
+  let licker = new Licker(this, ctx, bs);
+
+  let pool = new Pool(licker.lick);
 
   let collision;
 
+  this.play = play;
+
   this.init = data => {
     collision = data.collision;
+
+    licker.init({});
+
   };
 
   this.release = (gang) => {
-    pool.release(gang);
+    // pool.release(gang);
   };
 
   const spawn = () => {

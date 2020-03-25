@@ -28,9 +28,10 @@ export function CandyPath({yoyo,
 
   this.settled = () => iPath.settled();
 
+  const progress = this.progress = () => iPath.easing(easing);
+
   const currentPoint = this.currentPoint = (offset = 0) => {
-    let iPoints = Math.floor(iPath.easing(easing) *
-                             (points.length - 1));
+    let iPoints = Math.floor(progress() * (points.length - 1));
 
     iPoints += offset;
     iPoints = Math.min(iPoints, points.length - 1);
