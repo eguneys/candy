@@ -15,8 +15,7 @@ export function app(element, options) {
 
   new Assets({
     'candy': 'candy.png',
-    'shoot': 'cshoot.png',
-    'explosion': 'cexplosion.png'
+    'shoot': 'cshoot.png'
   }, { assetsUrl }).start()
     .then(assets => {
 

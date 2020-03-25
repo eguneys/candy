@@ -5,6 +5,8 @@ export default function Animation(frames, { yoyo = true }) {
   let frame = frames[0];
   let iPol = new ipol(0, 1, { yoyo });
 
+  this.settled = iPol.settled;
+
   this.update = delta => {
 
     iPol.update(delta);

@@ -12,3 +12,29 @@ export const withDelay = (fn, delay, updateFn) => {
     }
   };
 };
+
+export function Delayer() {
+  
+  let items = [];
+
+  this.add = (fn, delay = 0) => {
+    items.push({
+      fn,
+      delay
+    });
+  };
+
+
+  this.update = (delta) => {
+    let res = [];
+    items.forEach((item) => {
+      item.delay -= delta;
+      if (item.delay < 0) {
+        item.fn();
+      } else {
+        res.push(item);
+      }
+    });
+    items = res;
+  };
+}

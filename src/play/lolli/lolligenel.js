@@ -6,6 +6,8 @@ import ipol from '../../ipol';
 
 import { PathCombined } from '../../candypath';
 
+import Explosion from '../explosion';
+
 export default function LolliGenelBody(play, ctx, bs) {
 
   const { canvas, 
@@ -18,6 +20,8 @@ export default function LolliGenelBody(play, ctx, bs) {
           frames } = ctx;
 
   const { width, height, candy: { width: candyWidth } } = bs;
+
+  let explosion = new Explosion(play, ctx, bs);
 
   let dBg;
   dBg = sprite(frames['candy']);
@@ -41,7 +45,7 @@ export default function LolliGenelBody(play, ctx, bs) {
   this.init = data => {
     let paths = data.paths;
 
-    maxDamageResist = 20;
+    maxDamageResist = 10;
     damageResistFrames = maxDamageResist;
 
     iDamageKickbackY.both(0, 0);
@@ -53,6 +57,8 @@ export default function LolliGenelBody(play, ctx, bs) {
     bodyCollisionCircle = circle(0, 0, candyWidth * 0.5);
     collisionId = data.collision.add(this, bodyCollisionCircle);
     dataCollision = data.collision;
+
+    explosion.init({});
   };
 
   const damageScale = () => {
@@ -72,20 +78,31 @@ export default function LolliGenelBody(play, ctx, bs) {
     let dValue = iDamageKickbackY.value();
     iDamageKickbackY.both(0, dValue - 1);
 
-    dBg.tint = 0xffffab;
+    dBg.tint = 0xfffffd;
   };
 
   this.damage = shoot => {
 
     damage();
+  };
 
+  let exploding;
+
+  const explode = () => {
+    if (exploding) {
+      return;
+    }
+    exploding = true;
+    let point = path.currentPoint();
+    explosion.explosion(...point);
   };
 
   const updateDamage = () => {
     if (iDamageKickbackY.settled()) {
-      dBg.tint = 0xffffff;
+      dBg.tint = 0xcccccc;
     }
     if (damageScale() < 0.1) {
+      explode();
       release();
     }
   };
@@ -106,6 +123,8 @@ export default function LolliGenelBody(play, ctx, bs) {
     if (path.settled()) {
       release(); 
     }
+
+    explosion.update(delta);
   };
 
 
@@ -117,5 +136,7 @@ export default function LolliGenelBody(play, ctx, bs) {
     let damageWidth = candyWidth - (1 - damageScale()) * damageShrinkFactor;
     dBg.width = damageWidth;
     dBg.height = damageWidth;
+
+    explosion.render();
   };
 }
