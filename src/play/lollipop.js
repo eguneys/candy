@@ -10,7 +10,7 @@ import * as mu from 'mutilz';
 
 import ipol from '../ipol';
 
-import { Easings } from '../ipol';
+import { Easings, Easings2 } from '../ipol';
 
 import { CandyPath, PathCombined } from '../candypath';
 
@@ -162,7 +162,7 @@ function LollipopBody(play, ctx, bs) {
     path1.init(x, - candyWidth,
                x, height - candyWidth);
     path2.init(x, height - candyWidth,
-               edgeX, 0);
+               edgeX, 0, 0.1);
     path.init([path1, path2]);
 
     bodyCollisionCircle = circle(0, 0, candyWidth * 0.5);

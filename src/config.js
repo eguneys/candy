@@ -4,6 +4,10 @@ export default function Config() {
       FastUpdateRate = SlowUpdateRate * 2.0;
   
   return {
+    candy: {
+      SlowUpdateRate: SlowUpdateRate * 2,
+      FastUpdateRate: SlowUpdateRate * 4
+    },
     FastUpdateRate,
     SlowUpdateRate
   };

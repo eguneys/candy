@@ -13,6 +13,8 @@ export function CandyPath({yoyo,
       points,
       iPath = new ipol(0, 0, { yoyo });
 
+  let iUpdateRate = new ipol(0, 0, {});
+
   this.init = (x, y, x2, y2, bent = 0.01) => {
     path.clear();
     path.bent(line([x, y],
@@ -20,6 +22,8 @@ export function CandyPath({yoyo,
 
     points = path.points();
     iPath.both(0, 1);
+
+    iUpdateRate.both(0, 1);
   };
 
   this.settled = () => iPath.settled();
@@ -37,7 +41,10 @@ export function CandyPath({yoyo,
   };
 
   this.update = (delta) => {
-    iPath.update(delta * pathUpdateRate);
+    let updateRate = iUpdateRate.value();
+
+    iPath.update(delta * (pathUpdateRate + pathUpdateRate * 2 * updateRate));
+    iUpdateRate.update(delta * pathUpdateRate);
   };
 
 }

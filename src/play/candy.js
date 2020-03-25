@@ -79,15 +79,18 @@ function CandyBody(play, ctx, bs) {
 
   const { canvas, 
           events,
+          config: {
+            candy: {
+              SlowUpdateRate,
+              FastUpdateRate
+            }
+          },
           layers: { scene, oneLayer }, 
           frames } = ctx;
 
   let { width, height, candy: { width: candyWidth } } = bs;
 
   let aBounce = new Animation(frames['bounce'], {});
-
-  const SlowUpdateRate = 0.001 * 1.0,
-        FastUpdateRate = SlowUpdateRate * 2.0;
 
   let standingPath = new CandyPath({ yoyo: true, 
                                      updateRate: SlowUpdateRate });

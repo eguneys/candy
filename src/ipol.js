@@ -31,6 +31,10 @@ export const Easings = {
   easeInOutQuint: t => t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t
 };
 
+export const Easings2 = {
+  easeOutQuad: t => t*(2-t),
+};
+
 
 export default function interpolator(a, b = a, { 
   yoyo
